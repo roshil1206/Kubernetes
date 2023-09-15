@@ -1,0 +1,57 @@
+# Reffered from https://www.udemy.com/course/docker-kubernetes-the-practical-guide/
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: roshil
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application1
+  labels:
+    app: application1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: application1
+  template:
+    metadata:
+      name: application1-pods
+      labels:
+        app: application1
+    spec:
+      containers:
+        - name: application1-node
+          image: us-central1-docker.pkg.dev/cloudcomputing-389920/application1/app
+          ports:
+            - containerPort: 6000
+          volumeMounts:
+            - name: myvolume
+              mountPath: "/Roshil_PV_dir"
+      volumes:
+        - name: myvolume
+          persistentVolumeClaim:
+            claimName: roshil
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: application1-service
+spec:
+  selector:
+    app: application1
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 6000

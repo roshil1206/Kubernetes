@@ -1,0 +1,43 @@
+# Reffered from https://www.udemy.com/course/docker-kubernetes-the-practical-guide/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application2
+  labels:
+    app: application2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: application2
+  template:
+    metadata:
+      name: application2-pods
+      labels:
+        app: application2
+    spec:
+      containers:
+        - name: application2-node
+          image: us-central1-docker.pkg.dev/cloudcomputing-389920/application2/app
+          ports:
+            - containerPort: 3500
+          volumeMounts:
+            - name: myvolume
+              mountPath: "/Roshil_PV_dir"
+      volumes:
+        - name: myvolume
+          persistentVolumeClaim:
+            claimName: roshil
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: application2-service
+spec:
+  selector:
+    app: application2
+  ports:
+    - protocol: TCP
+      port: 3500
+      targetPort: 3500

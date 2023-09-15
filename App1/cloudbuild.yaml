@@ -1,0 +1,30 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "us-central1-docker.pkg.dev/cloudcomputing-389920/application1/app:${SHORT_SHA}",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "us-central1-docker.pkg.dev/cloudcomputing-389920/application1/app:${SHORT_SHA}",
+      ]
+
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    id: "Deployment"
+    args:
+      [
+        "run",
+        "--filename=deployment.yaml",
+        "--image=us-central1-docker.pkg.dev/cloudcomputing-389920/application1/app:${SHORT_SHA}",
+        "--location=us-central1-c",
+        "--cluster=gke-demo",
+      ]
+
+images:
+  - us-central1-docker.pkg.dev/cloudcomputing-389920/application1/app:${SHORT_SHA}
